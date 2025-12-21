@@ -26,7 +26,6 @@ class _DepositScreenState extends State<DepositScreen> {
     100: 'assets/100uah.png',
     200: 'assets/200uah.png',
     500: 'assets/500uah.jpg',
-    1000: 'assets/100uah.png', // Якщо немає 1000uah.png, використовуємо 100
   };
 
   String _formatCard(String input) {
@@ -65,21 +64,21 @@ class _DepositScreenState extends State<DepositScreen> {
       _currentBillAsset = _billAssets[value] ?? 'assets/100uah.png';
     });
 
-    // Час "механічного" затягування
-    await Future.delayed(2600.ms);
+    // Сповільнена анімація "затягування" (3 секунди)
+    await Future.delayed(3000.ms);
 
     if (mounted) {
       setState(() {
         _depositedAmount += value;
         _isInserting = false;
       });
-      HapticFeedback.mediumImpact();
+      HapticFeedback.heavyImpact();
     }
   }
 
   Future<void> _confirmDeposit() async {
     if (_depositedAmount <= 0) {
-      ATMService.showError(context, 'Ви не вставили жодної купюри');
+      ATMService.showError(context, 'Ви не вставили жодну купюру');
       return;
     }
 
@@ -165,49 +164,21 @@ class _DepositScreenState extends State<DepositScreen> {
         Text(
           'СУМА: ${_depositedAmount.toStringAsFixed(0)} ₴',
           style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.green),
-        ).animate(key: ValueKey(_depositedAmount)).scale(duration: 400.ms, curve: Curves.elasticOut),
+        ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
         
-        const SizedBox(height: 10),
+        const SizedBox(height: 20),
         
+        // ПРИЙМАЧ БАНКОМАТА
         SizedBox(
-          height: 220, 
+          height: 250, 
           width: 300,
           child: Stack(
             alignment: Alignment.topCenter,
             children: [
-              // 1. Темний проріз (куди ховається купюра)
-              Positioned(
-                top: 45,
-                child: Container(
-                  width: 210,
-                  height: 25,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-
-              // 2. Купюра (Анімація)
-              if (_isInserting)
-                Positioned(
-                  top: 70, 
-                  child: Image.asset(
-                    _currentBillAsset,
-                    width: 170,
-                    height: 85,
-                    fit: BoxFit.contain,
-                  )
-                  .animate()
-                  .moveY(begin: 15, end: -55, duration: 2500.ms, curve: Curves.slowMiddle)
-                  .scaleY(begin: 1.0, end: 0.1, duration: 2500.ms, curve: Curves.easeInQuart)
-                  .fadeOut(duration: 2200.ms),
-                ),
-
-              // 3. Панель банкомата (Зверху купюри)
+              // 1. Панель банкомата (основа)
               Container(
                 width: 260,
-                height: 80,
+                height: 100,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [Colors.grey.shade300, Colors.grey.shade500],
@@ -223,9 +194,10 @@ class _DepositScreenState extends State<DepositScreen> {
                   children: [
                     const Text("INSERT BILL", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black54)),
                     const SizedBox(height: 8),
+                    // Світловий індикатор прорізу
                     Container(
                       width: 190,
-                      height: 8,
+                      height: 10,
                       decoration: BoxDecoration(
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(10),
@@ -237,16 +209,35 @@ class _DepositScreenState extends State<DepositScreen> {
                   ],
                 ),
               ),
+
+              // 2. Купюра, яка рухається (Тепер вона ОСТАННЯ в списку, щоб бути ЗВЕРХУ)
+              if (_isInserting)
+                Positioned(
+                  top: 110, // Починаємо трохи нижче панелі
+                  child: Image.asset(
+                    _currentBillAsset,
+                    width: 160,
+                    height: 80,
+                    fit: BoxFit.contain,
+                  )
+                  .animate()
+                  // Плавний рух вгору до прорізу
+                  .moveY(begin: 0, end: -75, duration: 3000.ms, curve: Curves.easeInOutSine)
+                  // Ефект фізичного заходження (стискання по висоті в кінці)
+                  .scaleY(begin: 1.0, end: 0.05, duration: 3000.ms, curve: Curves.easeInCirc)
+                  // Зникнення при вході
+                  .fadeOut(delay: 1500.ms, duration: 1000.ms),
+                ),
             ],
           ),
         ),
 
         const Text("Оберіть номінал для поповнення:", style: TextStyle(fontSize: 14, color: Colors.grey)),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
         Wrap(
-          spacing: 12,
-          runSpacing: 12,
+          spacing: 15,
+          runSpacing: 15,
           alignment: WrapAlignment.center,
           children: [
             _buildBillBtn(100, 'assets/100uah.png'),
@@ -277,8 +268,8 @@ class _DepositScreenState extends State<DepositScreen> {
     return GestureDetector(
       onTap: () => _insertBill(value),
       child: Container(
-        width: 105,
-        height: 55,
+        width: 110,
+        height: 60,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, 2))],
@@ -289,18 +280,18 @@ class _DepositScreenState extends State<DepositScreen> {
             fit: StackFit.expand,
             children: [
               Image.asset(asset, fit: BoxFit.cover),
-              Container(color: Colors.black.withOpacity(0.15)),
+              Container(color: Colors.black.withOpacity(0.1)),
               Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(4)),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(6)),
                   child: Text("${value.toInt()} ₴", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                 ),
               ),
             ],
           ),
         ),
-      ).animate(onPlay: (c) => c.repeat(reverse: true)).moveY(begin: 0, end: -2, duration: 1200.ms),
+      ).animate(onPlay: (c) => c.repeat(reverse: true)).moveY(begin: 0, end: -3, duration: 1500.ms),
     );
   }
 }
