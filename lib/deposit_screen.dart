@@ -20,14 +20,13 @@ class _DepositScreenState extends State<DepositScreen> {
   BankAccount? _currentAccount;
   double _depositedAmount = 0;
   bool _isInserting = false;
-  String _currentBillAsset = 'assets/100uah.png'; // Дефолтне зображення
+  String _currentBillAsset = 'assets/100uah.png';
 
-  // Мапінг номіналів до ваших зображень
   final Map<double, String> _billAssets = {
     100: 'assets/100uah.png',
     200: 'assets/200uah.png',
     500: 'assets/500uah.jpg',
-    1000: 'assets/1000uah.png', // Використаємо ngl для великого номіналу
+    1000: 'assets/100uah.png', // Якщо немає 1000uah.png, використовуємо 100
   };
 
   String _formatCard(String input) {
@@ -63,18 +62,19 @@ class _DepositScreenState extends State<DepositScreen> {
 
     setState(() {
       _isInserting = true;
-      _currentBillAsset = _billAssets[value]!;
+      _currentBillAsset = _billAssets[value] ?? 'assets/100uah.png';
     });
 
-    // Час анімації всмоктування
-    await Future.delayed(1200.ms);
+    // Час "механічного" затягування
+    await Future.delayed(2600.ms);
 
-    setState(() {
-      _depositedAmount += value;
-      _isInserting = false;
-    });
-    
-    HapticFeedback.heavyImpact(); 
+    if (mounted) {
+      setState(() {
+        _depositedAmount += value;
+        _isInserting = false;
+      });
+      HapticFeedback.mediumImpact();
+    }
   }
 
   Future<void> _confirmDeposit() async {
@@ -165,97 +165,93 @@ class _DepositScreenState extends State<DepositScreen> {
         Text(
           'СУМА: ${_depositedAmount.toStringAsFixed(0)} ₴',
           style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.green),
-        ).animate(target: _depositedAmount > 0 ? 1 : 0).scale(duration: 300.ms).then().shimmer(),
+        ).animate(key: ValueKey(_depositedAmount)).scale(duration: 400.ms, curve: Curves.elasticOut),
         
-        const SizedBox(height: 30),
+        const SizedBox(height: 10),
         
-        // Візуалізація банкомата з ефектом всмоктування
         SizedBox(
-          height: 300,
+          height: 220, 
           width: 300,
           child: Stack(
-            alignment: Alignment.center,
+            alignment: Alignment.topCenter,
             children: [
-              // 1. Внутрішня частина (темрява за прорізом)
+              // 1. Темний проріз (куди ховається купюра)
               Positioned(
-                top: 80,
+                top: 45,
                 child: Container(
-                  width: 220,
-                  height: 40,
+                  width: 210,
+                  height: 25,
                   decoration: BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(4),
                   ),
                 ),
               ),
 
-              // 2. Купюра, яка рухається
+              // 2. Купюра (Анімація)
               if (_isInserting)
                 Positioned(
-                  bottom: 0,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(5),
-                    child: Image.asset(
-                      _currentBillAsset,
-                      width: 180,
-                      height: 90,
-                      fit: BoxFit.cover,
-                    ),
+                  top: 70, 
+                  child: Image.asset(
+                    _currentBillAsset,
+                    width: 170,
+                    height: 85,
+                    fit: BoxFit.contain,
                   )
                   .animate()
-                  .moveY(begin: 150, end: -40, duration: 1200.ms, curve: Curves.easeInOutExpo)
-                  .scale(begin: const Offset(1, 1), end: const Offset(0.8, 0.5), duration: 1200.ms)
-                  .fadeOut(delay: 800.ms),
+                  .moveY(begin: 15, end: -55, duration: 2500.ms, curve: Curves.slowMiddle)
+                  .scaleY(begin: 1.0, end: 0.1, duration: 2500.ms, curve: Curves.easeInQuart)
+                  .fadeOut(duration: 2200.ms),
                 ),
 
-              // 3. Передня панель банкомата (над купюрою)
-              Align(
-                alignment: Alignment.topCenter,
-                child: Container(
-                  width: 260,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade400,
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Colors.grey.shade600, width: 3),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10)],
+              // 3. Панель банкомата (Зверху купюри)
+              Container(
+                width: 260,
+                height: 80,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.grey.shade300, Colors.grey.shade500],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("INSERT CASH", style: TextStyle(letterSpacing: 2, fontSize: 12, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 10),
-                      // Сам проріз
-                      Container(
-                        width: 200,
-                        height: 12,
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.greenAccent.withOpacity(0.5)),
-                        ),
-                      ).animate(onPlay: (c) => c.repeat()).shimmer(duration: 2.seconds, color: Colors.greenAccent.withOpacity(0.3)),
-                    ],
-                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade700, width: 2),
+                  boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: const Offset(0, 4))],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("INSERT BILL", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black54)),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 190,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Container()
+                          .animate(onPlay: (c) => c.repeat())
+                          .shimmer(duration: 1500.ms, color: Colors.greenAccent.withOpacity(0.5)),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
         ),
 
-        const Text("Оберіть купюру:", style: TextStyle(fontSize: 16, color: Colors.grey)),
-        const SizedBox(height: 20),
+        const Text("Оберіть номінал для поповнення:", style: TextStyle(fontSize: 14, color: Colors.grey)),
+        const SizedBox(height: 16),
 
-        // Кнопки-купюри
         Wrap(
-          spacing: 15,
-          runSpacing: 15,
+          spacing: 12,
+          runSpacing: 12,
           alignment: WrapAlignment.center,
           children: [
             _buildBillBtn(100, 'assets/100uah.png'),
             _buildBillBtn(200, 'assets/200uah.png'),
             _buildBillBtn(500, 'assets/500uah.jpg'),
-            _buildBillBtn(1000, 'assets/1000uah.png'),
           ],
         ),
 
@@ -270,7 +266,7 @@ class _DepositScreenState extends State<DepositScreen> {
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             ),
-            child: const Text('ЗАРАХУВАТИ КОШТИ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            child: const Text('ЗАРАХУВАТИ НА КАРТКУ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
         ),
       ],
@@ -281,24 +277,30 @@ class _DepositScreenState extends State<DepositScreen> {
     return GestureDetector(
       onTap: () => _insertBill(value),
       child: Container(
-        width: 100,
+        width: 105,
         height: 55,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade300),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4)],
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, 2))],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(7),
+          borderRadius: BorderRadius.circular(8),
           child: Stack(
+            fit: StackFit.expand,
             children: [
-              Image.asset(asset, fit: BoxFit.cover, width: double.infinity, height: double.infinity),
-              Container(color: Colors.black.withOpacity(0.2)),
-              Center(child: Text("${value.toInt()} ₴", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))),
+              Image.asset(asset, fit: BoxFit.cover),
+              Container(color: Colors.black.withOpacity(0.15)),
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(4)),
+                  child: Text("${value.toInt()} ₴", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                ),
+              ),
             ],
           ),
         ),
-      ).animate(onPlay: (c) => c.repeat(reverse: true)).moveY(begin: 0, end: -3, duration: 1.seconds),
+      ).animate(onPlay: (c) => c.repeat(reverse: true)).moveY(begin: 0, end: -2, duration: 1200.ms),
     );
   }
 }
