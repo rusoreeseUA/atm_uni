@@ -32,14 +32,21 @@ class _CreateCardScreenState extends State<CreateCardScreen> {
         cardNumber: _cardNumberController.text.trim().replaceAll(' ', ''),
         cvv: _cvvController.text.trim(),
         pin: _pinController.text.trim(),
-        balance: 0.0, // завжди 0 при створенні
+        balance: 100.0,
       );
 
-     setState(() {
-  CardRepository.addCard(newAccount);
-});
-      ATMService.showSuccess(context, "Вашу картку успішно додано до Бази Даних");
-      Navigator.pop(context); // повертаємось назад після збереження
+      CardRepository().addCard(newAccount).then((_) async {
+        // ДОДАВАННЯ ЛОГУ
+        await CardRepository().addLog(TransactionLog(
+          action: 'Створення картки',
+          cardNumber: newAccount.cardNumber,
+          dateTime: DateTime.now(),
+          details: 'Створено нову картку для ${newAccount.fullName}',
+        ));
+
+        ATMService.showSuccess(context, "Картку успішно створено та збережено");
+        Navigator.pop(context);
+      });
     }
   }
 
@@ -76,16 +83,15 @@ class _CreateCardScreenState extends State<CreateCardScreen> {
                   maxLength: 40,
                   validator: (value) =>
                       value == null || value.isEmpty ? "Введіть прізвище та ім’я" : null,
-                      topPadding: 4,
-                  
+                  topPadding: 4,
                 ),
                 _buildTextField(
-          controller: _passportSerialController,
-          label: "Серія паспорта",
-          maxLength: 6, // максимум 6 символів
-          validator: (value) =>
-        value == null || value.length != 6 ? "Серія паспорта має містити 6 символів" : null,
-        ),
+                  controller: _passportSerialController,
+                  label: "Серія паспорта",
+                  maxLength: 6,
+                  validator: (value) =>
+                      value == null || value.length != 6 ? "Серія паспорта має містити 6 символів" : null,
+                ),
                 _buildTextField(
                   controller: _idNumberController,
                   label: "Ідентифікаційний номер",
@@ -156,34 +162,33 @@ class _CreateCardScreenState extends State<CreateCardScreen> {
     );
   }
 
- Widget _buildTextField({
-  required TextEditingController controller,
-  required String label,
-  TextInputType keyboardType = TextInputType.text,
-  bool obscureText = false,
-  String? prefixText,
-  int? maxLength,
-  List<TextInputFormatter>? inputFormatters,
-  String? Function(String?)? validator,
-  double topPadding = 0.0,
-}) {
-  return Padding(
-    padding: EdgeInsets.only(bottom: 16.0, top: topPadding),
-    child: TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      obscureText: obscureText,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      maxLength: maxLength,
-      inputFormatters: inputFormatters,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixText: prefixText,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+    String? prefixText,
+    int? maxLength,
+    List<TextInputFormatter>? inputFormatters,
+    String? Function(String?)? validator,
+    double topPadding = 0.0,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16.0, top: topPadding),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        obscureText: obscureText,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        maxLength: maxLength,
+        inputFormatters: inputFormatters,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixText: prefixText,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        validator: validator,
       ),
-      validator: validator,
-    ),
-  );
-}
-
+    );
+  }
 }

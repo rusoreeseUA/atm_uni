@@ -1,9 +1,18 @@
 import 'package:atm_project_unic/card_list_screen.dart';
 import 'package:atm_project_unic/create_card_screen.dart';
-import 'package:atm_project_unic/login_screen.dart';
+import 'package:atm_project_unic/deposit_screen.dart';
+import 'package:atm_project_unic/intro_screen.dart'; // Імпортуємо IntroScreen
+import 'package:atm_project_unic/balance_screen.dart';
+import 'package:atm_project_unic/card_repository.dart';
+import 'package:atm_project_unic/logs_screen.dart';
+import 'package:atm_project_unic/transfer_screen.dart';
+import 'package:atm_project_unic/withdrawal_screen.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Ініціалізація бази даних (завантажується швидко, доки йде інтро)
+  await CardRepository().loadAccounts(); 
   runApp(const ATMApp());
 }
 
@@ -17,13 +26,27 @@ class ATMApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        // Налаштуємо стиль AppBar глобально, щоб він виглядав гарно всюди
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.green.shade700,
+          foregroundColor: Colors.white, // Колір тексту та іконок
+          centerTitle: true,
+          elevation: 4,
+          titleTextStyle: const TextStyle(
+            fontSize: 22, 
+            fontWeight: FontWeight.bold, 
+            color: Colors.white
+          ),
+        ),
         useMaterial3: true,
       ),
-      home: const MainMenuScreen(),
+      // ЗМІНЕНО: Тепер стартовий екран - це IntroScreen
+      home: const IntroScreen(),
     );
   }
 }
 
+// MainMenuScreen залишається без змін, але ми його експортуємо для IntroScreen
 class MainMenuScreen extends StatelessWidget {
   const MainMenuScreen({super.key});
 
@@ -31,17 +54,9 @@ class MainMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      // AppBar тепер бере стиль з глобальної теми, заданої вище
       appBar: AppBar(
-        backgroundColor: Colors.green.shade700,
-        centerTitle: true,
-        title: const Text(
-          "ATM Головне Меню",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
+        title: const Text("ATM Головне Меню"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -56,7 +71,7 @@ class MainMenuScreen extends StatelessWidget {
             _buildATMButton(context, "Переказ", Icons.swap_horiz),
             _buildATMButton(context, "Логи", Icons.list_alt),
             _buildATMButton(context, "Створити картку", Icons.credit_card),
-            _buildATMButton(context, "Список карток", Icons.view_list), // 🔹 нова кнопка
+            _buildATMButton(context, "Список карток", Icons.view_list),
             _buildATMButton(context, "Вихід", Icons.exit_to_app),
           ],
         ),
@@ -65,46 +80,53 @@ class MainMenuScreen extends StatelessWidget {
   }
 
   Widget _buildATMButton(BuildContext context, String label, IconData icon) {
+    // Кольорова схема для кнопок
+    final Color primaryColor = Theme.of(context).colorScheme.primary;
+    final Color onPrimaryColor = Theme.of(context).colorScheme.onPrimary;
+
     return ElevatedButton(
-      // ... стиль кнопки ...
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white, // Фон кнопки білий
+        foregroundColor: primaryColor, // Іконка та текст зелені
+        elevation: 5, // Тінь
+        shadowColor: Colors.green.withOpacity(0.3),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16), // Заокруглені кути
+          side: BorderSide(color: primaryColor.withOpacity(0.5), width: 1)
+        ),
+      ),
       onPressed: () {
         if (label == "Баланс") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => BalanceScreen()),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const BalanceScreen()));
+        } else if (label == "Список карток") {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const CardListScreen()));
+        } else if (label == "Створити картку") {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateCardScreen()));
         } 
-        else if (label == "Список карток") {
-          // Перехід на екран зі списком карток
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const CardListScreen()),
-          );
+        else if (label == "Зняття") {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const WithdrawScreen()));
         }
-        else if (label == "Створити картку") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const CreateCardScreen()),
-          );
-        } 
-        else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Натиснуто: $label")),
-          );
+         else if (label == "Переказ") {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const TransferScreen()));
+        }
+         else if (label == "Логи") {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const LogsScreen()));
+        }
+         else if (label == "Поповнення") {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const DepositScreen()));
+        }
+        else if (label == "Вихід") {
+           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Сесію завершено")));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Функція '$label' в розробці")));
         }
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 50),
+          Icon(icon, size: 48),
           const SizedBox(height: 12),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          )
+          Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ],
       ),
     );

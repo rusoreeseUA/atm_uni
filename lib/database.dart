@@ -42,39 +42,42 @@ class BankAccount {
       pin: json['pin'],
       balance: (json['balance'] as num).toDouble(),
     );
+    
+  }
+}
+// Додайте це в lib/database.dart
+
+class TransactionLog {
+  final String action;      // Тип дії (Зняття, Переказ, Перевірка балансу тощо)
+  final String cardNumber;  // Номер картки, з якою працювали
+  final double? amount;     // Сума (якщо є)
+  final DateTime dateTime;  // Дата та час
+  final String details;     // Додаткова інформація
+
+  TransactionLog({
+    required this.action,
+    required this.cardNumber,
+    this.amount,
+    required this.dateTime,
+    required this.details,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'action': action,
+        'cardNumber': cardNumber,
+        'amount': amount,
+        'dateTime': dateTime.toIso8601String(),
+        'details': details,
+      };
+
+  factory TransactionLog.fromJson(Map<String, dynamic> json) {
+    return TransactionLog(
+      action: json['action'],
+      cardNumber: json['cardNumber'],
+      amount: json['amount'],
+      dateTime: DateTime.parse(json['dateTime']),
+      details: json['details'],
+    );
   }
 }
 
-// Приклад трьох записів у «базі»
-final List<BankAccount> mockAccounts = [
-  BankAccount(
-    fullName: 'Mike Oxlong',
-    passportSerial: 'AB1234',
-    idNumber: '1234567890',
-    phone: '+380990000001',
-    cardNumber: '1111111111111111',
-    cvv: '123',
-    pin: '1111',
-    balance: 1500.0,
-  ),
-  BankAccount(
-    fullName: 'Kys Benis',
-    passportSerial: 'CD6543',
-    idNumber: '0987654321',
-    phone: '+380990000002',
-    cardNumber: '1111111111111112',
-    cvv: '456',
-    pin: '2222',
-    balance: 3000.0,
-  ),
-  BankAccount(
-    fullName: 'Sug Madig',
-    passportSerial: 'EF9876',
-    idNumber: '1122334455',
-    phone: '+380990000003',
-    cardNumber: '1111111111111113',
-    cvv: '789',
-    pin: '3333',
-    balance: 750.0,
-  ),
-];
