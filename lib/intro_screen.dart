@@ -9,7 +9,7 @@ class IntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Таймер для автоматичного переходу до головного меню через 5 секунд
+   
     Timer(const Duration(milliseconds: 6000), () {
       if (context.mounted) {
         Navigator.of(context).pushReplacement(
@@ -19,7 +19,7 @@ class IntroScreen extends StatelessWidget {
     });
 
     return Scaffold(
-      backgroundColor: Colors.black, // Темний фон виглядає преміально
+      backgroundColor: Colors.black, 
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -31,14 +31,14 @@ class IntroScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Логотип з виправленою кривою анімації: Curves.easeOutBack
+            
            ClipRRect(
-  borderRadius: BorderRadius.circular(180.0), // Радіус заокруглення
+  borderRadius: BorderRadius.circular(180.0), 
   child: Image.asset(
     'assets/finals.png',
     width: 250,
     height: 250,
-    fit: BoxFit.cover, // Важливо, щоб зображення заповнювало простір для коректного обрізання
+    fit: BoxFit.cover, 
   ),
 )
                 .animate()
@@ -46,14 +46,14 @@ class IntroScreen extends StatelessWidget {
                 .scale(
                   delay: 200.ms, 
                   duration: 600.ms, 
-                  curve: Curves.easeOutBack, // ВИПРАВЛЕНО ТУТ
+                  curve: Curves.easeOutBack, 
                 )
                 .shimmer(delay: 1500.ms, duration: 1200.ms, color: Colors.greenAccent)
                 .moveY(begin: 0, end: -20, delay: 3000.ms, duration: 1000.ms, curve: Curves.easeInOut),
 
             const SizedBox(height: 40),
 
-            // Анімований текст назви банку
+          
             DefaultTextStyle(
               style: const TextStyle(
                 fontSize: 32.0,
@@ -78,7 +78,7 @@ class IntroScreen extends StatelessWidget {
 
             const SizedBox(height: 60),
 
-            // Стильний індикатор завантаження під логотипом
+          
             const CircularProgressIndicator(
               color: Colors.greenAccent,
               strokeWidth: 2,

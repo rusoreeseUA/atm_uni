@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class ATMService {
-  /// Показ кастомного SnackBar
   static void showCustomSnackBar({
     required BuildContext context,
     required String message,
@@ -35,7 +34,6 @@ class ATMService {
       ..showSnackBar(snackBar);
   }
 
-  /// SnackBar успішного виконання
   static void showSuccess(BuildContext context, String message) {
     showCustomSnackBar(
       context: context,
@@ -45,7 +43,6 @@ class ATMService {
     );
   }
 
-  /// SnackBar у разі помилки
   static void showError(BuildContext context, String message) {
     showCustomSnackBar(
       context: context,
@@ -55,7 +52,6 @@ class ATMService {
     );
   }
 
-  /// SnackBar інформаційного повідомлення
   static void showInfo(BuildContext context, String message) {
     showCustomSnackBar(
       context: context,

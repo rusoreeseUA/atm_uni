@@ -64,7 +64,6 @@ class _DepositScreenState extends State<DepositScreen> {
       _currentBillAsset = _billAssets[value] ?? 'assets/100uah.png';
     });
 
-    // Сповільнена анімація "затягування" (3 секунди)
     await Future.delayed(3000.ms);
 
     if (mounted) {
@@ -168,14 +167,14 @@ class _DepositScreenState extends State<DepositScreen> {
         
         const SizedBox(height: 20),
         
-        // ПРИЙМАЧ БАНКОМАТА
+      
         SizedBox(
           height: 250, 
           width: 300,
           child: Stack(
             alignment: Alignment.topCenter,
             children: [
-              // 1. Панель банкомата (основа)
+            
               Container(
                 width: 260,
                 height: 100,
@@ -194,7 +193,7 @@ class _DepositScreenState extends State<DepositScreen> {
                   children: [
                     const Text("INSERT BILL", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black54)),
                     const SizedBox(height: 8),
-                    // Світловий індикатор прорізу
+                  
                     Container(
                       width: 190,
                       height: 10,
@@ -210,10 +209,10 @@ class _DepositScreenState extends State<DepositScreen> {
                 ),
               ),
 
-              // 2. Купюра, яка рухається (Тепер вона ОСТАННЯ в списку, щоб бути ЗВЕРХУ)
+         
               if (_isInserting)
                 Positioned(
-                  top: 110, // Починаємо трохи нижче панелі
+                  top: 110, 
                   child: Image.asset(
                     _currentBillAsset,
                     width: 160,
@@ -221,11 +220,11 @@ class _DepositScreenState extends State<DepositScreen> {
                     fit: BoxFit.contain,
                   )
                   .animate()
-                  // Плавний рух вгору до прорізу
+              
                   .moveY(begin: 0, end: -75, duration: 3000.ms, curve: Curves.easeInOutSine)
-                  // Ефект фізичного заходження (стискання по висоті в кінці)
+          
                   .scaleY(begin: 1.0, end: 0.05, duration: 3000.ms, curve: Curves.easeInCirc)
-                  // Зникнення при вході
+                  
                   .fadeOut(delay: 1500.ms, duration: 1000.ms),
                 ),
             ],

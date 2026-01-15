@@ -84,7 +84,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
       allCards[index] = updatedAccount;
       await CardRepository().saveAccounts(); 
 
-      // ДОДАВАННЯ ЛОГУ
+    
       await CardRepository().addLog(TransactionLog(
         action: 'Зняття готівки',
         cardNumber: _currentAccount!.cardNumber,

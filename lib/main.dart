@@ -1,7 +1,7 @@
 import 'package:atm_project_unic/card_list_screen.dart';
 import 'package:atm_project_unic/create_card_screen.dart';
 import 'package:atm_project_unic/deposit_screen.dart';
-import 'package:atm_project_unic/intro_screen.dart'; // Імпортуємо IntroScreen
+import 'package:atm_project_unic/intro_screen.dart';
 import 'package:atm_project_unic/balance_screen.dart';
 import 'package:atm_project_unic/card_repository.dart';
 import 'package:atm_project_unic/logs_screen.dart';
@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Ініціалізація бази даних (завантажується швидко, доки йде інтро)
+ 
   await CardRepository().loadAccounts(); 
   runApp(const ATMApp());
 }
@@ -26,10 +26,10 @@ class ATMApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        // Налаштуємо стиль AppBar глобально, щоб він виглядав гарно всюди
+       
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.green.shade700,
-          foregroundColor: Colors.white, // Колір тексту та іконок
+          foregroundColor: Colors.white,
           centerTitle: true,
           elevation: 4,
           titleTextStyle: const TextStyle(
@@ -40,13 +40,13 @@ class ATMApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      // ЗМІНЕНО: Тепер стартовий екран - це IntroScreen
+     
       home: const IntroScreen(),
     );
   }
 }
 
-// MainMenuScreen залишається без змін, але ми його експортуємо для IntroScreen
+
 class MainMenuScreen extends StatelessWidget {
   const MainMenuScreen({super.key});
 
@@ -54,7 +54,7 @@ class MainMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // AppBar тепер бере стиль з глобальної теми, заданої вище
+     
       appBar: AppBar(
         title: const Text("ATM Головне Меню"),
       ),
@@ -80,18 +80,18 @@ class MainMenuScreen extends StatelessWidget {
   }
 
   Widget _buildATMButton(BuildContext context, String label, IconData icon) {
-    // Кольорова схема для кнопок
+  
     final Color primaryColor = Theme.of(context).colorScheme.primary;
     final Color onPrimaryColor = Theme.of(context).colorScheme.onPrimary;
 
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white, // Фон кнопки білий
-        foregroundColor: primaryColor, // Іконка та текст зелені
-        elevation: 5, // Тінь
+        backgroundColor: Colors.white, 
+        foregroundColor: primaryColor,
+        elevation: 5, 
         shadowColor: Colors.green.withOpacity(0.3),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16), // Заокруглені кути
+          borderRadius: BorderRadius.circular(16),
           side: BorderSide(color: primaryColor.withOpacity(0.5), width: 1)
         ),
       ),

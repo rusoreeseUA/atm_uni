@@ -23,8 +23,7 @@ class _CardListScreenState extends State<CardListScreen> {
 
   void _refreshCards() {
     setState(() {
-      // Використовуємо Singleton репозиторій. 
-      // Переконайтеся, що у вашому CardRepository є метод getAllCards() або замініть на getAll()
+   
       cards = CardRepository().getAllCards();
     });
   }
@@ -82,7 +81,6 @@ class _CardListScreenState extends State<CardListScreen> {
   }
 }
 
-// ОКРЕМИЙ ВІДЖЕТ КАРТКИ ДЛЯ ЛОГІКИ ПЕРЕВОРОТУ ТА ВІДОБРАЖЕННЯ
 class BankCardWidget extends StatefulWidget {
   final BankAccount card;
   final VoidCallback onDelete;
@@ -94,14 +92,14 @@ class BankCardWidget extends StatefulWidget {
 }
 
 class _BankCardWidgetState extends State<BankCardWidget> {
-  bool _isBackVisible = false;      // Чи бачимо задню сторону
-  bool _showFullNumber = false;    // Чи бачимо повний номер
-  bool _showCVV = false;           // Чи бачимо CVV
+  bool _isBackVisible = false;      
+  bool _showFullNumber = false;    
+  bool _showCVV = false;           
 
   void _toggleFlip() {
     setState(() {
       _isBackVisible = !_isBackVisible;
-      _showCVV = false; // Приховуємо CVV при кожному перевороті назад/вперед
+      _showCVV = false; 
     });
   }
 
@@ -117,12 +115,12 @@ class _BankCardWidgetState extends State<BankCardWidget> {
         return Transform(
           alignment: Alignment.center,
           transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.001) // Ефект перспективи
+            ..setEntry(3, 2, 0.001) 
             ..rotateY(value * pi / 180),
           child: isBack
               ? Transform(
                   alignment: Alignment.center,
-                  transform: Matrix4.identity()..rotateY(pi), // Щоб текст не був дзеркальним
+                  transform: Matrix4.identity()..rotateY(pi),
                   child: _buildBackSide(),
                 )
               : _buildFrontSide(),
@@ -131,7 +129,6 @@ class _BankCardWidgetState extends State<BankCardWidget> {
     );
   }
 
-  // ПЕРЕДНЯ СТОРОНА
   Widget _buildFrontSide() {
     return _cardContainer(
       child: Column(
@@ -203,7 +200,7 @@ class _BankCardWidgetState extends State<BankCardWidget> {
     );
   }
 
-  // ЗАДНЯ СТОРОНА
+
   Widget _buildBackSide() {
     return _cardContainer(
       child: Column(
@@ -214,7 +211,7 @@ class _BankCardWidgetState extends State<BankCardWidget> {
             height: 45,
             width: double.infinity,
             color: Colors.black.withOpacity(0.8),
-          ), // Магнітна стрічка
+          ), 
           const SizedBox(height: 20),
           Row(
             children: [
@@ -274,7 +271,7 @@ class _BankCardWidgetState extends State<BankCardWidget> {
   Widget _cardContainer({required Widget child}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
-      height: 220, // Фіксована висота для стабільності
+      height: 220, 
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(

@@ -25,13 +25,11 @@ class _BalanceScreenState extends State<BalanceScreen> {
   String? _generatedCode;
   BankAccount? _matchedAccount;
 
-  // Форматування картки XXXX XXXX XXXX XXXX
- // Форматування картки XXXX XXXX XXXX XXXX
   String _formatCardNumber(String input) {
-    // 1. Залишаємо тільки цифри
+ 
     String digits = input.replaceAll(RegExp(r'\D'), '');
     
-    // 2. ОБМЕЖЕННЯ: беремо лише перші 16 символів
+
     if (digits.length > 16) {
       digits = digits.substring(0, 16);
     }
@@ -39,7 +37,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
     final buffer = StringBuffer();
     for (int i = 0; i < digits.length; i++) {
       buffer.write(digits[i]);
-      // Додаємо пробіл після кожної 4-ї цифри, якщо це не кінець рядка
+      
       if ((i + 1) % 4 == 0 && i + 1 != digits.length) {
         buffer.write(' ');
       }
@@ -182,8 +180,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  // Перемикач методу входу
-                  SegmentedButton<LoginMethod>(
+                    SegmentedButton<LoginMethod>(
                     segments: const [
                       ButtonSegment(value: LoginMethod.cardPhone, label: Text('SMS-код'), icon: Icon(Icons.sms)),
                       ButtonSegment(value: LoginMethod.pin, label: Text('PIN-код'), icon: Icon(Icons.password)),
@@ -199,39 +196,39 @@ class _BalanceScreenState extends State<BalanceScreen> {
                   ),
                   const SizedBox(height: 25),
 
-                  // Поле Номер картки
+                 
                  TextField(
                     controller: _cardController,
                     keyboardType: TextInputType.number,
-                    // 16 цифр + 3 пробіли = 19 символів максимум
+                  
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
                       LengthLimitingTextInputFormatter(19), 
                     ],
                     onChanged: (value) {
                       final formatted = _formatCardNumber(value);
-                      // Оновлюємо значення тільки якщо воно відрізняється від поточного
+                     
                       if (formatted != value) {
                         _cardController.value = TextEditingValue(
                           text: formatted,
                           selection: TextSelection.collapsed(offset: formatted.length),
                         );
                       }
-                      setState(() {}); // Для оновлення лічильників, якщо вони є
+                      setState(() {}); 
                     },
                     decoration: InputDecoration(
                       labelText: 'Номер картки',
                       prefixIcon: const Icon(Icons.credit_card),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
                       hintText: "0000 0000 0000 0000",
-                      // Можна додати лічильник для візуального контролю
+                     
                       counterText: "${_cardController.text.replaceAll(' ', '').length}/16",
                     ),
                   ),
                   const SizedBox(height: 15),
 
                   if (_loginMethod == LoginMethod.cardPhone) ...[
-                    // Логіка SMS
+                    
                     TextField(
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
@@ -289,7 +286,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
                       ),
                     ),
                   ] else ...[
-                    // Логіка PIN
+                   
                     TextField(
                       controller: _pinController,
                       obscureText: true,

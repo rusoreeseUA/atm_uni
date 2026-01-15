@@ -1,4 +1,4 @@
-// database.dart - локальна «база даних» карток
+
 class BankAccount {
   final String fullName;
   final String passportSerial;
@@ -45,14 +45,13 @@ class BankAccount {
     
   }
 }
-// Додайте це в lib/database.dart
 
 class TransactionLog {
-  final String action;      // Тип дії (Зняття, Переказ, Перевірка балансу тощо)
-  final String cardNumber;  // Номер картки, з якою працювали
-  final double? amount;     // Сума (якщо є)
-  final DateTime dateTime;  // Дата та час
-  final String details;     // Додаткова інформація
+  final String action;      
+  final String cardNumber; 
+  final double? amount;     
+  final DateTime dateTime;  
+  final String details;    
 
   TransactionLog({
     required this.action,

@@ -14,7 +14,7 @@ class _LogsScreenState extends State<LogsScreen> {
   String _selectedFilter = 'Всі';
   final List<String> _filters = ['Всі', 'Зняття', 'Переказ', 'Поповнення', 'Баланс', 'Створення'];
 
-  // Допоміжна функція для маскування номера картки (**** 1234)
+
   String _maskCard(String card) {
     if (card.length < 4) return card;
     return "**** ${card.substring(card.length - 4)}";
@@ -22,11 +22,10 @@ class _LogsScreenState extends State<LogsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Отримуємо логи та сортуємо їх (найсвіжіші зверху)
+   
     List<TransactionLog> allLogs = CardRepository().getAllLogs();
     allLogs.sort((a, b) => b.dateTime.compareTo(a.dateTime));
 
-    // Фільтрація
     List<TransactionLog> filteredLogs = _selectedFilter == 'Всі'
         ? allLogs
         : allLogs.where((log) => log.action.contains(_selectedFilter)).toList();
@@ -40,7 +39,7 @@ class _LogsScreenState extends State<LogsScreen> {
       ),
       body: Column(
         children: [
-          // Рядок з фільтрами
+         
           Container(
             height: 70,
             color: Colors.white,
@@ -76,7 +75,7 @@ class _LogsScreenState extends State<LogsScreen> {
             ),
           ),
           
-          // Список логів
+        
           Expanded(
             child: filteredLogs.isEmpty
                 ? _buildEmptyState()
@@ -111,7 +110,7 @@ class _LogsScreenState extends State<LogsScreen> {
     IconData iconData;
     bool isTransfer = log.action.contains('Переказ');
 
-    // Визначення стилю залежно від типу операції
+   
     if (log.action.contains('Зняття')) {
       iconColor = Colors.orange.shade700;
       iconData = Icons.money_off_rounded;
@@ -159,13 +158,13 @@ class _LogsScreenState extends State<LogsScreen> {
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       const SizedBox(height: 4),
-                      // Відображення деталей картки
+                    
                       if (isTransfer)
                         Row(
                           children: [
                             Text(_maskCard(log.cardNumber), style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.w600)),
                             const Icon(Icons.arrow_right_alt, size: 18, color: Colors.grey),
-                            // Спроба дістати номер отримувача з тексту details
+                           
                             Text(
                               _maskCard(log.details.replaceAll(RegExp(r'[^0-9]'), '')),
                               style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.w600),

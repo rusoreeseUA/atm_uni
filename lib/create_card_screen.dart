@@ -36,7 +36,7 @@ class _CreateCardScreenState extends State<CreateCardScreen> {
       );
 
       CardRepository().addCard(newAccount).then((_) async {
-        // ДОДАВАННЯ ЛОГУ
+      
         await CardRepository().addLog(TransactionLog(
           action: 'Створення картки',
           cardNumber: newAccount.cardNumber,

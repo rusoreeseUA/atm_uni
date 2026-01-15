@@ -89,7 +89,7 @@ class _TransferScreenState extends State<TransferScreen> {
 
       await CardRepository().saveAccounts();
 
-      // ДОДАВАННЯ ЛОГУ
+  
       await CardRepository().addLog(TransactionLog(
         action: 'Переказ коштів',
         cardNumber: _senderAccount!.cardNumber,
